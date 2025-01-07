@@ -107,28 +107,27 @@ def spatial_query(request):
         host="localhost",
         port="5432"
     )
-    
+    cursor = conn.cursor()
+
     try:
-        cursor = conn.cursor()
-        
-        # Main spatial query
         query = f"""
+        SELECT jsonb_build_object(
+            'type', 'FeatureCollection',
+            'features', jsonb_agg(feature)
+        )
+        FROM (
             SELECT jsonb_build_object(
-                'type',     'FeatureCollection',
-                'features', jsonb_agg(feature)
-            )
+                'type', 'Feature',
+                'id', id,
+                'geometry', ST_AsGeoJSON(geom)::jsonb,
+                'properties', to_jsonb(row) - 'geom'
+            ) AS feature
             FROM (
-                SELECT jsonb_build_object(
-                    'type',       'Feature',
-                    'geometry',   ST_AsGeoJSON(geom)::jsonb,
-                    'properties', to_jsonb(row) - 'geom'
-                ) AS feature
-                FROM (
-                    SELECT *
-                    FROM {layer_name}
-                    WHERE {property_name} = %s
-                ) row
-            ) features;
+                SELECT *
+                FROM {layer_name}
+                WHERE {property_name} = %s
+            ) row
+        ) features;
         """
         
         cursor.execute(query, (value,))
@@ -152,16 +151,15 @@ def geoserver_ccq(request):
     
     geoserver_url = (
         f"http://localhost:8080/geoserver/ows?"
-        f"service=WFS&version=1.0.0&request=GetFeature&"
-        f"typeName={layer_name}&outputFormat=application/json&"
-        f"CQL_FILTER={cql_filter}"
+        f"service=WFS&version=1.0.0&request=GetFeature&typeName={layer_name}"
+        f"&outputFormat=application/json&CQL_FILTER={cql_filter}"
     )
     
     response = requests.get(geoserver_url)
     if response.status_code == 200:
         return JsonResponse(response.json())
     else:
-        return JsonResponse({'error': 'Unable to perform CQL query'}, status=response.status_code)
+        return JsonResponse({'error': 'Unable to fetch data from GeoServer'}, status=response.status_code)
 
 def get_property_values(request):
     layer = request.GET.get('layer')
