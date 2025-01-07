@@ -150,7 +150,7 @@ def geoserver_ccq(request):
     cql_filter = f"{property_name}='{value}'"
     
     geoserver_url = (
-        f"http://localhost:8080/geoserver/ows?"
+        f"http://localhost:8080/geoserver/wms?"
         f"service=WFS&version=1.0.0&request=GetFeature&typeName={layer_name}"
         f"&outputFormat=application/json&CQL_FILTER={cql_filter}"
     )
