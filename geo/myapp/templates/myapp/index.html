@@ -1,0 +1,183 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nepal’s Biodiversity Chronicles</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    rel="stylesheet"
+    crossorigin="anonymous"
+  />
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
+  <link rel="stylesheet" href="{% static 'myapp/css/styles.css' %}" />
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>Nepal’s Biodiversity Chronicles</h1>
+<p>Uncover the hidden gems of Nepal's natural world, from unique species to thriving ecosystems.</p>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Nepal's Biodiversity</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="{% url 'about' %}"
+              target="_blank"
+              title="About"
+            >
+              About
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="{% url 'documentation' %}"
+              target="_blank"
+              title="Technical Documentation"
+            >
+              Technical Documentation
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Map Section -->
+  <div class="container mt-5">
+
+    <!-- Description Box -->
+    <div class="description-box">
+      <p class="text-muted">
+        Nepal is one of the richest countries in terms of biodiversity. From the towering Himalayas to the lush Terai region, it hosts a wide range of ecosystems, supporting over 28,000 species of plants and animals, including rare and endemic species. Nepal's diverse flora and fauna are crucial to the global ecological balance.
+      </p>
+      <p class="text-muted">
+        Nepal, a small landlocked country nestled in the Himalayas, is one of the richest nations in terms of biodiversity. Despite its relatively small size, Nepal boasts a remarkable variety of ecosystems, ranging from tropical jungles in the Terai plains to alpine meadows at the base of the towering peaks of the Himalayas. The country’s geographic diversity, from the lowlands of the Terai to the highest point on Earth, Mount Everest, creates an environment conducive to the flourishing of a wide range of plant and animal species.
+      </p>
+      <p class="text-muted">
+        <strong>Ecosystem Diversity:</strong> Nepal’s ecosystems are incredibly diverse due to its varied topography and climate. The country is divided into three main ecological regions:
+      </p>
+      <p class="text-muted">
+        <strong>Flora Diversity:</strong> Nepal is home to over 6,000 species of plants, including the Nepali rhododendron (Rhododendron arboreum), the national flower. The country also boasts critical medicinal plants like sal trees and various species of wildflowers and herbs in the alpine meadows.
+      </p>
+      <p class="text-muted">
+        <strong>Fauna Diversity:</strong> With more than 200 species of mammals, 900 species of birds, and 180 species of reptiles, Nepal hosts iconic animals such as the Bengal tiger, wild elephants, and snow leopards. It is also home to rare species like the red panda and the Himalayan black bear.
+      </p>
+      <p class="text-muted">
+        <strong>Conservation Efforts:</strong> Nepal has established numerous national parks, including Chitwan National Park, Bardiya National Park, and Sagarmatha National Park, to conserve its rich biodiversity. These areas are not only vital for wildlife protection but also contribute to eco-tourism.
+      </p>
+      <p class="text-muted">
+        <strong>Climate Change and Biodiversity:</strong> The Himalayas are particularly vulnerable to climate change, which is impacting species that depend on cold, remote habitats. Efforts are underway to address these challenges and protect Nepal's unique ecosystems.
+      </p>
+      <p class="text-muted">
+        In conclusion, Nepal’s biodiversity is a global treasure that must be conserved for future generations. By safeguarding its ecosystems, we ensure a sustainable and harmonious balance between nature and humanity.
+      </p>
+
+      <img
+        src="{% static 'myapp/images/main.png' %}" 
+        alt="Nepal's Biodiversity"
+        class="img-fluid rounded shadow-lg"
+        style="max-width: 100%; height:auto"
+      />
+    </div>
+
+  </div>
+
+  <!-- Info Section -->
+  <div class="info-section bg-light py-5">
+    <div class="container">
+      <h2 class="text-center mb-4">Why Map Nepal's Biodiversity?</h2>
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="card info-card">
+            <div class="card-body text-center">
+              <h5 class="card-title">
+                <a href="{% url 'species' %}" target="_blank">Species Diversity</a>
+              </h5>
+              <p class="card-text">
+                Nepal hosts over 28,000 species, ranging from rare birds to endemic plants.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card info-card">
+            <div class="card-body text-center">
+              <h5 class="card-title">
+                <a href="{% url 'conservation_effort' %}" target="_blank">Conservation Efforts</a>
+              </h5>
+              <p class="card-text">
+                Support national parks and local initiatives by understanding species distribution.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card info-card">
+            <div class="card-body text-center">
+              <h5 class="card-title">
+                <a href="{% url 'map_view' %}" target="_blank">Geospatial Analysis</a>
+              </h5>
+              <p class="card-text">
+                Leverage geospatial functions to highlight the applications of spatial data for understanding Nepal's biodiversity.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 Biodiversity Mapping Project | <a href="{% url 'about' %}" target="_blank">Contact Us</a>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="scripts.js"></script>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script
+    src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+    crossorigin="anonymous"
+  ></script>
+</body>
+</html>

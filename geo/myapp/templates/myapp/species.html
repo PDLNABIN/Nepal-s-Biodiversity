@@ -1,0 +1,331 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Species Diversity in Nepal</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    rel="stylesheet"
+    crossorigin="anonymous"
+  />
+  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'myapp/css/species.css' %}" />
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <div class="container text-center text-white">
+      <h1 class="display-4">Species Diversity in Nepal</h1>
+      <p class="lead">Discover the incredible diversity of species that call Nepal home.</p>
+    </div>
+  </div>
+
+  <!-- Introduction Section -->
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Introduction to Species Diversity</h2>
+    <p class="lead text-center">
+      Nepal is home to over 28,000 species of Animals, Birds, and Plants. From the majestic Himalayas to the tropical lowlands, Nepal's diverse ecosystems support a wide range of biodiversity. This rich diversity includes rare and endemic species that are crucial to the health of the planet.
+    </p>
+  </div>
+
+  <!-- Species Information Section -->
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Some Key Species in Nepal</h2>
+    <!-- Row 1: Bengal Tiger and One-Horned Rhino -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <img src="https://imgs.search.brave.com/0HFkPWce7UIYn5VUXbEiq8P4-DHt03pDd07mRbuCFUg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJzLmNvbS9p/bWFnZXMvZmVhdHVy/ZWQvYmVuZ2FsLXRp/Z2VyLXBpY3R1cmVz/LXhpZWo2emdjcmMz/eTYydWsuanBn" class="card-img-top" alt="Royal Bengal Tiger">
+          <div class="card-body">
+            <h5 class="card-title">Royal Bengal Tiger</h5>
+            <p class="card-text">
+              The Bengal tiger is one of the most iconic species found in Nepal's Terai region. Known for its strength and agility, it plays a key role in maintaining the balance of the ecosystem.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <img src="https://imgs.search.brave.com/_s6yY4aH8fWrr3PL6iMwYdmRovo1YHcICMUnZvIkYK4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJjYXZlLmNv/bS93cC93cDE4NjQ0/MTIuanBn" class="card-img-top" alt="One-Horned Rhinoceros">
+          <div class="card-body">
+            <h5 class="card-title">One-Horned Rhinoceros</h5>
+            <p class="card-text">
+              The one-horned rhino is a symbol of Nepal's conservation efforts. Found in national parks like Chitwan, this species is a true conservation success story.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Row 2: Red Panda and Rhododendron -->
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <div class="card">
+          <img src="https://imgs.search.brave.com/G0cpzAH_2oiJk_VTsjsgrbIprjvtFvvgBfWZR8tms6I/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJjYXZlLmNv/bS93cC93cDgyNDA3/ODkuanBn" class="card-img-top" alt="Red Panda">
+          <div class="card-body">
+            <h5 class="card-title">Red Panda</h5>
+            <p class="card-text">
+              Known for its playful behavior, the red panda is native to the eastern Himalayas. It is considered vulnerable due to habitat loss and poaching.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <img src="https://imgs.search.brave.com/ResfamYP136fVa15F2Mr1fCaADVrUrnJiLCWHExeQxA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/ZHJpdmUubmVwYWxk/YXRhYmFzZS5jb20v/dXBsb2Fkcy9pbWFn/ZXMvMjAyMzEyL2lt/YWdlXzc1MHhfNjU2/YjYzMDgxNjRkMy5q/cGc" class="card-img-top" alt="Rhododendron">
+          <div class="card-body">
+            <h5 class="card-title">Rhododendron</h5>
+            <p class="card-text">
+              Rhododendron is the national flower of Nepal and holds significant cultural importance in the country. Nepal is home to over 30 species of rhododendrons, which bloom between March and April, creating a spectacular display of colors including red, pink, purple, and white.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Leaflet Map Section -->
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Map showing Key Species of Nepal</h2>
+    <div id="map"></div>
+  </div>
+
+  <!-- Leaflet JS and dependencies -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- Updated JavaScript for Map -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Initialize Leaflet Map
+        const map = L.map('map').setView([27.7172, 85.3240], 7); // Centered on Nepal
+  
+        // Add OpenStreetMap Tile Layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+  
+        // Add Markers and Popups for Species Locations
+        const speciesLocations = [
+          {
+            name: "Royal Bengal Tiger",
+            coordinates: [27.5346, 84.3542],
+            description: "Found in Chitwan National Park and Bardia National Park.",
+            image: "https://imgs.search.brave.com/MZjxAmHNVnMu47GlA2tNa0PmxOi4MqUGTanBH2-uZIc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9hLXot/YW5pbWFscy5jb20v/bWVkaWEvMjAyMS8w/NS9pU3RvY2stMTQy/MDY3NjIwNC0xMDI0/eDY4MC5qcGc"
+          },
+          {
+            name: "One-Horned Rhinoceros",
+            coordinates: [27.5346, 84.3542],
+            description: "Located in Chitwan National Park and Shuklaphanta National Park.",
+            image: "https://imgs.search.brave.com/lKtYNOvr_ZLcR8xjg51Iu3i70ldtUbw63A9zvMO6Vrk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sYXpv/by5vcmcvd3AtY29u/dGVudC91cGxvYWRz/LzIwMjMvMDkvUmhp/bm8tR3JlYXRlci1P/bmUtSG9ybmVkLU1h/bGUtTWFyc2hhbGwt/SkVQXzc0OTYuanBn"
+          },
+          {
+            name: "Red Panda",
+            coordinates: [27.1185, 87.8929],
+            description: "Found in the forests of Ilam and Kanchenjunga Conservation Area.",
+            image: "https://imgs.search.brave.com/SYF3tNpQni63cOzk2EZuimrYIlsFsQQ1OU5T4zfoYFQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvNTg4/MzU0NjQ2L3Bob3Rv/L3JlZC1wYW5kYS5q/cGc_cz02MTJ4NjEy/Jnc9MCZrPTIwJmM9/V2xxZEoxN2ViVGN0/MmxBaUFSeDltbWR0/SWFENktrWVFWbUhm/eHBQVzNiST0"
+          },
+          {
+            name: "Snow Leopard",
+            coordinates: [28.2205, 85.6226],
+            description: "Inhabits Langtang National Park and Annapurna Conservation Area.",
+            image: "https://imgs.search.brave.com/MbNI0OHgxCufvWPzPANt7CSL-xqZbayAIszoiowhuMs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d2Yu/Y2Evd3AtY29udGVu/dC91cGxvYWRzLzIw/MjAvMDIvU25vdy1M/ZW9wYXJkLSVDMiVB/OS1EYXZpZC1MYXdz/b24tXy1XV0YtVUst/c2NhbGVkLWUxNTgz/MjczNTQ0MTI1Lmpw/Zw"
+          },
+          {
+            name: "Rhododendron Forests",
+            coordinates: [28.3843, 83.8780],
+            description: "Common in Annapurna Conservation Area and Makalu-Barun National Park.",
+            image: "https://imgs.search.brave.com/R9DgjHhZ2r-eshwFtLPOY9NhlddaQGaMXga3iitHvJY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy8x/LzFjL0dhcmRlbl93/aXRoX1Job2RvZGVu/ZHJvbnMuSlBH"
+          },
+          {
+            name: "Spiny Babbler",
+            coordinates: [27.6783, 85.3173],
+            description: "Endemic to Nepal, found in mid-hill regions like Kathmandu Valley.",
+            image: "https://imgs.search.brave.com/jZ9mit71y-LBwfgSeyvJzRTywu6CCPHeEmi-6ZDV9QA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ub3Rl/c25lcGFsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMC8w/OS9wYWdlLTgtOWMu/anBn"
+          },
+          {
+            name: "Himalayan Monal",
+            coordinates: [27.9323, 86.7846],
+            description: "Found in the alpine meadows of Sagarmatha National Park and Langtang National Park.",
+            image: "https://imgs.search.brave.com/RjqQEcKmUDm0uADCbPa2caLYY8spFdsa5yYs2OhR8T0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/bmF0dXJlaW5mb2N1/cy5pbi9tZWRpYS8x/MjgwLXNoYW50YW51/LXNvbXdhbnNoaS0y/MDE4MDgwODI0ODk1/MC0xLmpwZw"
+          },
+          {
+            name: "Yarsagumba",
+            coordinates: [29.6665, 82.0577],
+            description: "A medicinal fungus found in Dolpa, Rukum, and the high-altitude Himalayan regions.",
+            image: "https://imgs.search.brave.com/uCVRITVNgv2mT_494KRpUXysp9fN5yd5IRAx_WBG-5E/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/YWx0aXR1ZGVoaW1h/bGF5YS5jb20vbWVk/aWEvZmlsZXMvQmxv/Zy9BY3Rpdml0aWVz/L3lhcnNhZ3VtYmEt/bmVwYWwtaGVyYi5q/cGc"
+          },
+          {
+            name: "Himalayan Blue Sheep (Bharal)",
+            coordinates: [28.5708, 84.5585],
+            description: "Found in Manang, Mustang, and Sagarmatha National Park.",
+            image: "https://imgs.search.brave.com/YjG1XKwzwdBI3cOj2d_BpQNN6fBsLq4l_-mfrIFuq48/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWdz/Lm1vbmdhYmF5LmNv/bS93cC1jb250ZW50/L3VwbG9hZHMvc2l0/ZXMvMjAvMjAyMi8x/MS8yMzEzNDQyMy9I/aW1hbGF5YW5fQmx1/ZV9TaGVlcC03Njh4/NTEyLmpwZw"
+          },
+          {
+            name: "Golden Langur",
+            coordinates: [27.2953, 87.2118],
+            description: "Located in eastern Nepal, especially in temperate forests near Kanchenjunga.",
+            image: "https://imgs.search.brave.com/Mtn9y0R7dOPVnDRa7LzhkQvZj89pL_ClXjDmpDTlqnc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWdz/Lm1vbmdhYmF5LmNv/bS93cC1jb250ZW50/L3VwbG9hZHMvc2l0/ZXMvMjAvMjAyNC8w/Ny8xNzA4NDIzMi9E/b3JqaVdBMjRfMi1H/b2xkZW4tTGFuZ3Vy/QFJhdGFuR2lyaS0y/LmpwZw"
+          },
+          {
+            name: "Nepal Gray Langur",
+            coordinates: [28.2167, 83.9667],
+            description: "Found in the subtropical and temperate forests of Annapurna Conservation Area.",
+            image: "https://imgs.search.brave.com/BGGg5b-CbJz4W7QHrHaDbqWHtuEC7PUm_Dc6GUm7e7g/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy82/LzY2L05pbGdpcmlf/bGFuZ3VyXygxKV9i/eV9OLl9BLl9OYXNl/ZXIuanBn"
+          },
+          {
+            name: "Himalayan Yew",
+            coordinates: [28.0702, 85.5503],
+            description: "A tree species found in Langtang National Park and Makalu-Barun National Park.",
+            image: "https://imgs.search.brave.com/q3XC_5WcbBNGiRWgxSDyWRxwN4mjjgAf_M8_heJ-Cww/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/dGhlc3BydWNlLmNv/bS90aG1iL0ZmUVNw/dDBTaDdqaWpwZngy/ZlR3Zm16VmQ3ST0v/MTUwMHgwL2ZpbHRl/cnM6bm9fdXBzY2Fs/ZSgpOm1heF9ieXRl/cygxNTAwMDApOnN0/cmlwX2ljYygpL2ph/cGFuZXNlLXlld3Mt/YW5kLWVuZ2xpc2gt/eWV3LWJ1c2hlcy0y/MTMyMDY4LTA1LWI1/NjdmZjE5NTZlNjQ4/YjU4ZWIwM2Y0MWJk/NTZlMTQ3LmpwZw"
+          },
+          {
+            name: "Satyr Tragopan",
+            coordinates: [27.5365, 88.0145],
+            description: "A brightly colored pheasant found in Kanchenjunga Conservation Area.",
+            image: "https://imgs.search.brave.com/bNiMfU4CV-aTkj6VBEB5q5T5-tYOvkFtjqiE_iDjT8A/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvOTQ5/Njc2NzA2L3Bob3Rv/L3NhdHlydHJhZ29w/YW4tbWFsZS1jYXB0/aXZlLmpwZz9zPTYx/Mng2MTImdz0wJms9/MjAmYz1XWW5JeGsy/UUN1cTlhRnhCVS1S/ajZYZ1pzZ01ndGVY/bWEyanJOMnV6U2Nr/PQ"
+          }
+        ];
+  
+        // Define a custom icon
+const customIcon = L.icon({
+    iconUrl: '{% static 'myapp/images/marker.png' %}', // Replace with your custom icon's URL
+    iconSize: [32, 32], // Adjust the size of the icon
+    iconAnchor: [16, 32], // Anchor point of the icon
+    popupAnchor: [0, -32] // Position of the popup relative to the icon
+  });
+  
+  // Create a layer group to organize markers (for toggling)
+  const speciesLayer = L.layerGroup();
+  
+  // Add markers and popups dynamically for each species
+  speciesLocations.forEach(species => {
+    const marker = L.marker(species.coordinates, { icon: customIcon }).addTo(speciesLayer); // Add marker to layer
+    marker.bindPopup(`
+      <b>${species.name}</b><br>
+      <img src="${species.image}" alt="${species.name}" style="width:200px;height:auto;"><br>
+      ${species.description}
+    `);
+  }); 
+  // Add layer control
+  const overlays = {
+    "Key Species": speciesLayer,
+    };
+    L.control.layers(null, overlays).addTo(map);
+
+    // Add layers to the map
+    speciesLayer.addTo(map);
+    });
+</script>
+
+  <!-- Gallery Section -->
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Gallery of Some Species Endemic to Nepal</h2>
+    <p class="text-center mb-4">Click to display the information of each image</p>
+    <!-- Row 1 -->
+    <div class="row">
+      <div class="col-md-6">
+        <img 
+          src="https://imgs.search.brave.com/SD5EGFilooqjq043m-Mys-s7FBIkiKO8d-Xx71UHf_g/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90dW56/YS5lY28tZ2VuZXJh/dGlvbi5vcmcvZWRp/dG9yUGhvdG8vc3Bp/bnklMjBiYWJibGVy/MS5qcGc" 
+          class="img-fluid mb-3 gallery-img" 
+          alt="Spiney Babbler" 
+          data-toggle="modal" 
+          data-target="#speciesModal" 
+          data-species="Spiney Babbler" 
+          data-description="The Spiney Babbler is the only bird species endemic to Nepal. It thrives in mid-hill regions and is known for its melodious calls."
+        />
+      </div>
+      <div class="col-md-6">
+        <img 
+          src="https://imgs.search.brave.com/QkNDLkxcJIOgPk2BOTSdt2-0m42tsBH9k2pt2tHaMfw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9nZXR3/YWxscGFwZXJzLmNv/bS93YWxscGFwZXIv/ZnVsbC9iLzYvNS8x/MDM4Njc5LXBvcHVs/YXItc25vdy1sZW9w/YXJkLXdhbGxwYXBl/ci0xNDQweDI1NjAt/Zm9yLWFuZHJvaWQu/anBn" 
+          class="img-fluid mb-3 gallery-img" 
+          alt="Snow Leopard" 
+          data-toggle="modal" 
+          data-target="#speciesModal" 
+          data-species="Snow Leopard" 
+          data-description="The snow leopard, found in Nepal's high-altitude regions, is a symbol of resilience. It is critically endangered due to habitat loss."
+        />
+      </div>
+    </div>
+    <!-- Row 2 -->
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <img 
+          src="https://imgs.search.brave.com/FLznx1s3wyCh7JaCwTmUAsuujdoT_0sjCwhuh55CmLc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/YWxsYWJvdXRiaXJk/cy5vcmcvbmV3cy93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMC8w/Ni9HQWRqdXRhbnQt/bmVzdC1WeW4uanBn" 
+          class="img-fluid mb-3 gallery-img" 
+          alt="Greater Adjutant Stork"
+          data-toggle="modal" 
+          data-target="#speciesModal" 
+          data-species="Greater Adjutant Stork" 
+          data-description="The Greater Adjutant Stork is a rare and endangered bird found in the lowlands of Nepal. Conservation efforts have been vital to its survival."
+        />
+      </div>
+      <div class="col-md-6">
+        <img 
+          src="https://imgs.search.brave.com/ZDt-UdpOAXw5n8O6rTCZi4HybRQwyZi9S4urxnePajw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9hc3Nl/dHMtY2RuLmthdGht/YW5kdXBvc3QuY29t/L3VwbG9hZHMvc291/cmNlL25ld3MvMjAy/MC9uZXdzL3lhcnNh/Z3VtYmEtMTU5NTEy/MTk3Mi5wbmc" 
+          class="img-fluid mb-3 gallery-img" 
+          alt="Yarsagumba" 
+          data-toggle="modal" 
+          data-target="#speciesModal" 
+          data-species="Yarsagumba" 
+          data-description="Yarsagumba, a rare medicinal fungus found in Nepal's high-altitude regions, is often referred to as 'Himalayan Viagra' for its health benefits."
+        />
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="speciesModal" tabindex="-1" aria-labelledby="speciesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="speciesModalLabel"></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <img id="modalImage" src="" alt="" class="img-fluid mb-3">
+          <p id="modalDescription"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add this JavaScript for Modal functionality -->
+  <script>
+    // Add event listener for all gallery images
+    document.querySelectorAll('[data-toggle="modal"]').forEach(image => {
+      image.addEventListener('click', function () {
+        // Set the species name as the modal title
+        const speciesName = this.getAttribute('data-species');
+        document.getElementById('speciesModalLabel').textContent = speciesName;
+  
+        // Set the image in the modal
+        const modalImage = document.getElementById('modalImage');
+        modalImage.src = this.src;
+        modalImage.alt = speciesName;
+  
+        // Set the description in the modal
+        const speciesDescription = this.getAttribute('data-description');
+        document.getElementById('modalDescription').textContent = speciesDescription;
+      });
+    });
+  </script>
+  
+  <!-- Footer -->
+  <footer class="text-center py-4">
+    <p>&copy; 2025 Biodiversity Mapping Project| <a href="{% url 'about' %}" target="_blank">Contact Us</a></p>
+  </footer>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

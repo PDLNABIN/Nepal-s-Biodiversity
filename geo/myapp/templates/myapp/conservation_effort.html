@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conservation Efforts</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    rel="stylesheet"
+    crossorigin="anonymous"
+  />
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
+  <link rel="stylesheet" href="{% static 'myapp/css/conservation.css' %}" />
+</head>
+<body>
+<header class="head">
+    <h1>Conservation Efforts for Nepal's Biodiversity</h1>
+    <p>Join hands to protect the rich flora and fauna of Nepal.</p>
+</header>
+
+<!-- Conservation Section -->
+<div class="container mt-5">
+    <h2 class="text-center">Protected Areas in Nepal</h2>
+    <p class="text-center text-muted">
+      Learn about ongoing efforts to preserve Nepal's unique biodiversity.
+    </p>
+
+    <!-- Leaflet Map Section -->
+    <div id="map" style="height: 600px; margin-bottom: 20px;"></div>
+
+    <!-- Description Section -->
+    <div id="description" class="text-center p-3 border rounded" style="background-color: #f9f9f9;">
+      <h4>Select a location</h4>
+      <p>Click on a national park or conservation area marker to see details here.</p>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="text-center py-3">
+      &copy; 2025 Biodiversity Mapping Project | <a href="{% url 'about' %}" target="_blank">Contact Us</a>
+    </div>
+</footer>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+    // Define custom icons for national parks and conservation areas
+    const nationalParkIcon = L.icon({
+        iconUrl: '{% static "myapp/images/nationalpark.png" %}', // Path to the national park marker
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    });
+
+    const conservationAreaIcon = L.icon({
+        iconUrl: '{% static "myapp/images/conservationarea.png" %}', // Path to the conservation area marker
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    });
+
+    // Initialize Leaflet map
+    const map = L.map('map').setView([28.3949, 84.1240], 7); // Center at Nepal
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Add scale control
+    L.control.scale({ position: 'bottomleft', metric: true, imperial: false }).addTo(map);
+
+    // Data for national parks in Nepal
+    const parks = [
+        { name: "Chitwan National Park", province: "Bagmati", district: "Chitwan", coords: [27.5291, 84.3542], description: "Nepal's first national park is Chitwan National Park. Originally established as the Royal Chitwan National Park in 1973, it was designated a World Heritage Site in 1984.It spans 952.63 km2 (367.81 sq mi) in the districts of Nawalpur, Chitwan, Makwanpur, and Parsa, which are located in the subtropical Inner Terai lowlands of south-central Nepal.This park is a biodiversity hotspot with sal forests, grasslands, and riverine ecosystems. It shelters over 700 plant species, 68 mammal species such as Bengal tigers, one-horned rhinoceroses, and gharials, as well as over 600 bird species, including the greater adjutant and Bengal florican.", image: "https://imgs.search.brave.com/j-Im_AuRg4QKLKKmvnpBzAx19qTwMUvWHrpSaJDdyo8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90aWdl/cmVuY291bnRlci5j/b20vd3AtY29udGVu/dC91cGxvYWRzLzIw/MTkvMDUvTmF0aW9u/YWwtUGFyay5qcGc" },
+        { name: "Sagarmatha National Park", province: "Province 1", district: "Solukhumbu", coords: [27.9333, 86.8000], description: "In 1976, Sagarmatha National Park was established in the Solukhumbu District in the Himalayas in eastern Nepal. It has an area of 1,148 km2 (443 sq mi). With Mount Everest included, its elevation ranges from 2,845 to 8,848 m (9,334 to 29,029 ft). It borders Makalu Barun National Park to the east and the Dudh Kosi River to the south. The Sacred Himalayan Landscape includes it.Sagarmatha National Park is home to alpine vegetation, including rhododendrons, birch, and juniper. It protects over 1,000 plant species, 30 species of mammals like snow leopards, red pandas, Himalayan tahr, and musk deer, and around 200 bird species, including the Himalayan monal, blood pheasants, and snowcocks.", image:"https://nationalparks-15bc7.kxcdn.com/images/parks/sagarmatha/Sagarmatha%20National%20Park%20ama%20chablam.jpg" },
+        { name: "Bardiya National Park", province: "Lumbini", district: "Bardiya", coords: [28.3500, 81.6333], description: "Originally known as Royal Bardia National Park, Bardiya National Park is a protected area in Nepal that was established in 1988. The largest and most untouched national park in Nepal's Terai, it spans 968 km2 (374 sq mi) and is located in the Bardiya District, next to the eastern bank of the Karnali River and divided by the Babai River. The summit of the Siwalik Hills marks its northern boundaries. The protected region is severely disrupted by the Nepalgunj-Surkhet highway, which partially marks the southern boundary.Bardia protects around 500 plant species, 53 mammal species including Bengal tigers, swamp deer, and Gangetic dolphins, and over 400 bird species like the sarus crane, Bengal florican, and hornbills.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Bardiya_02.jpg/1920px-Bardiya_02.jpg" },
+        { name: "Langtang National Park", province: "Bagmati", district: "Rasuwa", coords: [28.2116, 85.5707], description: "The establishment of Lantang National Park in 1976 aimed to preserve the region's distinctive flora and fauna. It is the Central Himalayan Region's closest national park to Kathmandu, the country's capital. Located in the southern mountainous region of the Nepal-China (Tibet) border, the park spans 1710 square kilometers and includes portions of the districts of Nuwakot, Rasuwa, and Sindhupalchok. A 420 square kilometer region inside and surrounding the park was designated as a buffer zone in 1998. The park is rich in biodiversity and serves as a meeting place between the Indo-Malayan and Palearctic worlds. This park features oak, maple, fir, blue pine, and rhododendron forests, protecting approximately 1,000 plant species. It is also a refuge for 46 mammal species like red pandas, snow leopards, and Himalayan black bears, and 345 bird species, including the Danphe and wood snipe.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Gosainkunda_Lake.jpg/1920px-Gosainkunda_Lake.jpg" },
+        { name: "Rara National Park", province: "Karnali", district: "Mugu", coords: [29.5233, 82.1046], description: "In the Nepalese Himalayas, Rara National Park was established in 1976 as a protected area. In the districts of Mugu and Jumla, it is the smallest national park in the country, spanning 106 km2 (41 sq mi). Its primary feature is Rara Lake, which is 2,990 meters (9,810 feet) above sea level.The park was created in order to preserve Nepal's distinctive Humla-Jumla Region's flora and fauna.Centered around the pristine Rara Lake, this park shelters 500 plant species, 51 mammal species such as red pandas and Himalayan black bears, and 214 bird species, including coots and the Impeyan pheasant. The region is also rich in medicinal herbs and alpine vegetation.", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Rara_Lake_Northern_Corner.jpg/1920px-Rara_Lake_Northern_Corner.jpg" },
+        { name: "Makalu Barun National Park", province: "Province 1", district: "Sankhuwasabha", coords: [27.6167, 87.1667], description: "Makalu Barun National Park was established in 1991 as Sagarmatha National Park's eastern extension. It has a 1500 sq km area. Additionally, in 1999, the 830 sq km buffer zone was expanded. This protected area's elevation ranges from 435 m to more than 8000 m. As a result, Makalu Barun National Park is the only protected area in the world that has both tropical woods and snow-capped mountains. This protected region also contains Mount Makalu, the fifth-highest mountain in the world at 8,463 meters. Similarly, some of the peaks in the Makalu Region are Mera Peak (6654 m), Baruntse (7,129 m), and Chamlang (7,319 m). The sacred Himalayan landscape includes the national park as well.A biodiversity-rich area in eastern Nepal, it shelters 3,000 plant species, including rhododendrons and orchids, 88 mammal species like red pandas, snow leopards, and Assamese macaques, and 440 bird species such as sunbirds and spiny babblers.", image:"https://imgs.search.brave.com/iCFnd5R6TuLwTs5lUHqjejqpRYYAxjgg6HQviLKe_kY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy9h/L2E3L1JlcHVrX01h/a2FsdV9CYXJ1bl9W/YWxsZXlfTmVwYWwu/anBn" },
+        { name: "Shey Phoksundo National Park", province: "Karnali", district: "Dolpa", coords: [29.1811, 82.7569], description: "Shey-phoksundo National Park is situated in the Trans-Himalayan region of northwest Nepal. It is Nepal’s largest National Park covering an area of 3,555 km2. It was established in 1984 to preserve a unique Trans-Himalayan ecosystem with a diversity of flora and fauna. The Park’s climatic differences, altitude variations, and different zoo-geographical regions support a diverse range of biotic systems. In 1998, an area of 1349 km2 surrounding the park was declared as buffer zone, which consists of forests and private lands.Encompassing Shey Phoksundo Lake, this park is home to 1,000 plant species, 29 mammal species like snow leopards, blue sheep, and Tibetan wolves, and 200 bird species, including the Himalayan griffon and Tibetan snowcock.", image:"https://imgs.search.brave.com/huV6HcsIV892YczKqLpmVnkEDxRvr3Q8Hs3d_yhaD50/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/bmVwYWx0cmVra2lu/Zy5jb20vd3AtY29u/dGVudC91cGxvYWRz/LzIwMTkvMDMvc2hl/eS1waG9rc3VuZG8t/bmF0aW9uYWwtcGFy/ay0xLTk3NXg1NDAu/anBn"},
+        { name: "Khaptad National Park", province: "Sudurpashchim", district: "Doti", coords: [29.1619, 80.9100], description: "Famous for its religious significance and biodiversit, Khaptad National Park is located in the Far-western region of Nepal. The park was gazetted in 1984 covering an area of 225 sq. km. The area of buffer zone is 216 sq.km. The park is the only mid-mountain national park in western Nepal, representing a unique and important ecosystem. The late Khaptad Swami moved to the area in 1940's to meditate and worship. He spent about 50 years as a hermit and became a renowned spiritual saint.Known for its temperate forests and 224 medicinal herbs, Khaptad is home to 567 plant species, 23 mammal species like leopards and musk deer, and 287 bird species, including Danphe, partridges, and flycatchers.", image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/05/2c/e3/96/khaptad-grassland.jpg?w=900&h=-1&s=1" },
+        { name: "Shivapuri Nagarjun National Park", province: "Bagmati", district: "Kathmandu", coords: [27.8000, 85.4000], description: "Shivapuri Nagarjun National Park (159 sq km) is situated on the northern fringe of Kathmandu valley and lies about 12 km away from the center of capital city. The area was gazetted as the country's ninth national park in 2002. Prior its declaration as national park, it was managed under the Shivapuri Watershed Development Board, and was later declared as Shivapuri Watershed and Wildlife Reserve.It is home to over 500 plant species, including oaks, pines, and rhododendrons, and a variety of medicinal herbs. The park protects 19 mammal species, such as leopards, jungle cats, and Himalayan black bears, along with 177 bird species, including the Himalayan monal, kalij pheasant, and various woodpeckers.", image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/09/21/4d/ac/shivapuri-nagarjun-national.jpg?w=900&h=500&s=1" }
+    ];
+
+    // Data for conservation areas in Nepal
+    const conservationAreas = [
+        { name: "Annapurna Conservation Area", province: "Gandaki", district: "Kaski", coords: [28.5333, 83.8667], description: "Largest conservation area, The Annapurna Conservation Area (ACA) has been established in 1992. It has an area of 7629 sq. km. The conservation area encompasses the Annapurna himalayan range and also contains the world's deepest valley Kali Gandaki River Valley. It is bounded by the dry alpine deserts of Mustang and Tibet (China) in the north, by the Kali Gandaki River in the west, by Marsyandi Valley to wards east and by valleys and foothills of northern of Pokhara valley in the south border.It boasts diverse flora like rhododendrons, orchids, and medicinal plants. It is home to over 1,226 plant species, 100 mammal species including snow leopards and musk deer, and 478 bird species such as pheasants, vultures, and eagles.", image: "https://upload.wikimedia.org/wikipedia/commons/5/52/AnapurnaFromPokhara.jpg" },
+        { name: "Manaslu Conservation Area", province: "Gandaki", district: "Gorkha", coords: [28.5672, 84.5600], description: "Manaslu has been declared as conservation area in 1998 by the government of Nepal. It covers an area of 1663 sq. km. The area harbors a mosaic of habitats that inhabits 33 species of mammals, 110 species of birds, 11 species of butterflies and 3 species of reptiles. There are approx. 2000 species of plants, 11 types of forests and over 50 species on useful plants. The bio-climatic zones vary from sub-tropical to Nival. The altitude rises from a mere 600m. to the summit of Mt. Manaslu (8,163), the eighth highest peak in the world.", image: "https://imgs.search.brave.com/iBOb-JqHIf3xc-as5etucQy8bzm8lxFTKBZOvL3GlQM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9uZXBh/bGdyYW0uY29tL3dw/LWNvbnRlbnQvdXBs/b2Fkcy8yMDIyLzEy/L01hbmFzbHUtY29u/c2VydmF0aW9uLWFy/ZWEtMy0xMDI0eDQy/OS5qcGc" },
+        { name: "Kanchenjunga Conservation Area", province: "Province 1", district: "Taplejung", coords: [27.7041, 88.0986], description: "Kanchenjunga Conservation Area is named after Mt. Kanchenjunga (8,586m) - second highest mountain in Nepal and the third highest in the world. Kanchenjunga has been designated as a conservation area in March 1998. It covers an area of 2035 sq. km. in Taplejung district, lies in the northeast corner of Nepal. The conservation area with unique mountain ecosystems is envisioned as a tri-national peace park with Tibet Autonomous Region (TAR) of China to the north and Sikkim, India, in the east. Sikkim already has Khangchenzonga National Park adjoining KCA whereas the extension of Qomolungma Nature Reserve in TAR to cover the land bordering KCA is in progress from China side.Located near the world’s third-highest peak, it harbors 2,500 plant species, 250 bird species, and 20 mammal species, including snow leopards, red pandas, and Himalayan black bears. The region is also home to orchids, medicinal herbs, and rich avian life.", image: "https://imgs.search.brave.com/Y3N5oIz0wfNhE5FYX4rx5-WkIZk5xdDnJK5AFeXRezo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/bmVwYWx2aXNpdG9y/cy5jb20vd3AtY29u/dGVudC91cGxvYWRz/LzIwMjAvMDUva2Fu/Y2hlbmp1bmdhLXRy/ZWstOTAweDU0MC0x/LTc4MHg0NzAuanBn" },
+        { name: "Api Nampa Conservation Area", province: "Sudurpashchim", district: "Darchula", coords: [29.9000, 80.7333], description: "The Api-Nampa Conservation Area is a protected area in the western Nepal that was established in 2010. It has an area of 1,903 km2 (735 sq mi).It ranges in elevation from 518 to 7,132 m (1,699 to 23,399 ft) at the Himalayan peak Api, and is part of the Kailash Sacred Landscape. Named after the two peaks Api and Nampa, it was established to conserve the unique biodiversity and cultural heritage of the area. It is inhabited by 54,358 people living in 8966 households.Situated in the far-west, this conservation area shelters 1,200 plant species, 101 bird species, and mammals like musk deer, snow leopards, and Himalayan black bears. The region also supports medicinal herbs and alpine vegetation. ", image: "https://imgs.search.brave.com/9Cu9booy7Fofo9XE8P_MFhAx3icGeGjXwHCsZUjmBig/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/bGFuZG5lcGFsLmNv/bS93cC1jb250ZW50/L3VwbG9hZHMvMjAy/MC8wNS9BcGktTmFt/cGEtQ29uc2VydmF0/aW9uLUFyZWEuanBn" },
+        { name: "Gaurishankar Conservation Area", province: "Bagmati", district: "Dolakha", coords: [27.7903, 86.1476], description: "Gaurishankar Conservation Area covers an area of 2,179 square kilometers and encompasses 22 Village Development Committees of 3 districts (Alampu, Bigu, Bulung, Chankhu, Chilankha, Gaurishankar, Kalinchok, Khare, Laduk, Lamabagar, Marbu, Orang, Suri and Syama VDCs of Dolakha district; Fulpingkatti, Ghorthali, Gumba, Listikot, Marming and Tatopani VDCs of Sindhupalchok district; Chuchure and Gumdel VDCs of Ramechhap district).Encompassing the Gaurishankar mountain range, it harbors 2,035 plant species, 235 bird species, and 34 mammal species, including snow leopards, red pandas, and Himalayan tahrs. It also serves as a watershed for major rivers.", image: "https://imgs.search.brave.com/wAUqFZ8n3-DkAaI4ZE5jTiojVZUSHxDHc4EwodGsXIQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90aWdl/cmVuY291bnRlci5j/b20vd3AtY29udGVu/dC91cGxvYWRzLzIw/MjAvMDMvQ2xpbWF0/ZS1Mb2NhdGlvbi1H/YXVyaXNoYW5rYXIt/Q29uc2VydmF0aW9u/LWFyZWEtMTAyNHgz/ODQuanBn" }
+    ];
+
+    // Create layer groups
+    const nationalParksLayer = L.layerGroup();
+    const conservationAreasLayer = L.layerGroup();
+
+    // Function to add markers with click events
+    const addCustomMarker = (data, icon, layer, type) => {
+        data.forEach((location) => {
+            const marker = L.marker(location.coords, { icon: icon }).addTo(layer);
+            marker.on('click', () => {
+                // Update the description section with image and description
+                document.getElementById('description').innerHTML = `
+                    <h4>${location.name}</h4>
+                    <div style="display: flex; align-items: flex-start; gap: 20px;">
+                      <img src="${location.image}" alt="${location.name}" 
+                        style="width: 50%; max-height: 300px; object-fit: cover; flex-shrink: 0;" />
+                      <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 5px;">
+                        <p style="margin: 0; text-align:left;"><b>Type:</b> ${type}</p>
+                        <p style="margin: 0; text-align: left;"><b>Province:</b> ${location.province}</p>
+                        <p style="margin: 0; text-align: left;"><b>District:</b> ${location.district}</p>
+                        <p style="font-family: serif; font-weight: normal; text-align: left; margin: 0; color: #333; line-height: 1.5;">
+                        ${location.description || "Description not available."}
+                        </p>
+                      </div>
+                    </div>
+
+                `;
+            });
+        });
+    };
+
+    // Add markers to respective layers
+    addCustomMarker(parks, nationalParkIcon, nationalParksLayer, "National Park");
+    addCustomMarker(conservationAreas, conservationAreaIcon, conservationAreasLayer, "Conservation Area");
+
+    // Add layer control
+    const overlays = {
+        "National Parks": nationalParksLayer,
+        "Conservation Areas": conservationAreasLayer
+    };
+    L.control.layers(null, overlays).addTo(map);
+
+    // Add layers to the map
+    nationalParksLayer.addTo(map);
+    conservationAreasLayer.addTo(map);
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+.head {
+    background-image: url('Sagarmatha.jpg'); /* Path to your background image */
+    background-size: cover; /* Ensures the image covers the entire area */
+    background-position: center; /* Centers the image in the background */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    color: rgb(9, 9, 9); /* Fixed the color property */
+    text-align: center;
+    height: 85vh;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+/* Header */
+.head {
+    background-color: #007b5e;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Map Container */
+#map {
+    border: 2px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Description Section */
+#description h4 {
+    font-size: 1.5rem;
+    color: #007b5e;
+}
+
+#description p {
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Footer */
+footer {
+    background-color: #343a40;
+    color: white;
+    font-size: 0.9rem;
+}
+
+footer a {
+    color: #17a2b8;
+    text-decoration: none;
+}
+
+

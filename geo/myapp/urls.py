@@ -1,9 +1,15 @@
-# filepath: /c:/Users/USER/Desktop/virtWeb/geo/myapp/urls.py
+
 from django.urls import path
-from . import views
+from . import views  # Correct import statement
 
 urlpatterns = [
-    path('', views.map_view, name='map_view'),
+    path('map_view/', views.map_view, name='map_view'),
+    path('', views.index, name='index'),
+    path('about/', views.about, name='about'),
+    path('conservation_effort/', views.conservation_effort, name='conservation_effort'),
+    path('documentation/', views.documentation, name='documentation'),
+    path('species/', views.species, name='species'),
+    path('newsletter/', views.newsletter, name='newsletter'),
     path('get_occurrences_data/', views.get_occurrences_data, name='get_occurrences_data'),
     path('get_gbif_species_data/', views.get_gbif_species_data, name='get_gbif_species_data'),
     path('get_locations/', views.get_locations, name='get_locations'),
