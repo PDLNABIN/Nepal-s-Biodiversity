@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map View</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Map View</h1>
+        <div id="map" style="height: 500px;"></div>
+        <div class="row">
+            <div class="col-md-6">
+                <button id="fetch-geoserver-layers" class="btn btn-primary mt-3">Fetch GeoServer Layers</button>
+                <select id="geoserver-layers-dropdown" class="form-control mt-3">
+                    <option value="">Select GeoServer Layer</option>
+                </select>
+                <button id="fetch-postgis-layers" class="btn btn-secondary mt-3">Fetch PostGIS Layers</button>
+                <select id="postgis-layers-dropdown" class="form-control mt-3">
+                    <option value="">Select PostGIS Layer</option>
+                </select>
+                <button id="fetch-gbif-occurrences" class="btn btn-success mt-3">Fetch GBIF Occurrences</button>
+                <button id="fetch-gbif-species" class="btn btn-danger mt-3">Invasive Species</button>
+                <input type="number" id="buffer-diameter" class="form-control mt-3" placeholder="Buffer diameter in meters">
+                <button id="create-buffer" class="btn btn-warning mt-3">Create Buffer</button>
+                <h2>PostGIS Spatial Query</h2>
+                <select id="postgis-query-layer" class="form-control mt-3">
+                    <option value="">Select Layer</option>
+                </select>
+                <select id="postgis-query-property" class="form-control mt-3">
+                    <option value="">Select Property</option>
+                </select>
+                <select id="postgis-query-value" class="form-control mt-3">
+                    <option value="">Select Value</option>
+                </select>
+                <input type="number" id="postgis-query-radius" class="form-control mt-3" placeholder="Radius in meters">
+                <button id="perform-postgis-query" class="btn btn-info mt-3">Perform PostGIS Query</button>
+            </div>
+            <div class="col-md-6">
+                <h2>CQL Filtering</h2>
+                <select id="cql-query-layer" class="form-control mt-3">
+                    <option value="">Select Layer</option>
+                </select>
+                <input type="text" id="cql-query-property" class="form-control mt-3" placeholder="Property name">
+                <input type="text" id="cql-query-value" class="form-control mt-3" placeholder="Property value">
+                <button id="perform-cql-query" class="btn btn-info mt-3">Perform CQL Query</button>
+            </div>
+        </div>
+        <ul id="layers-list" class="mt-3"></ul>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 3);
+
+        // Add OpenStreetMap basemap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var occurrencesLayer = L.layerGroup().addTo(map);
+
+        document.getElementById('fetch-gbif-occurrences').addEventListener('click', function() {
+            fetch('/get_occurrences_data/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('GBIF Data:', data); // Debugging: Log the fetched data
+                    occurrencesLayer.clearLayers();
+                    L.geoJSON(data, {
+                        pointToLayer: function (feature, latlng) {
+                            if (feature.geometry.type === 'Point') {
+                                return L.marker(latlng);
+                            }
+                        },
+                        onEachFeature: function (feature, layer) {
+                            // Add popup for each occurrence
+                            if (feature.geometry.type === 'Point') {
+                                layer.bindPopup(`<b>Occurrence:</b> ${feature.properties.species}`);
+                            }
+                        }
+                    }).addTo(occurrencesLayer);
+                })
+                .catch(error => {
+                    console.error('Error fetching occurrences:', error);
+                });
+        });
+
+        document.getElementById('fetch-gbif-species').addEventListener('click', function() {
+            fetch('/get_gbif_species_data/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('GBIF Species Data:', data); // Debugging: Log the fetched data
+                    occurrencesLayer.clearLayers();
+                    L.geoJSON(data, {
+                        pointToLayer: function (feature, latlng) {
+                            if (feature.geometry.type === 'Point') {
+                                return L.marker(latlng);
+                            }
+                        },
+                        onEachFeature: function (feature, layer) {
+                            // Add popup for each species
+                            if (feature.geometry.type === 'Point') {
+                                layer.bindPopup(`<b>Species:</b> ${feature.properties.scientificName}`);
+                            }
+                        }
+                    }).addTo(occurrencesLayer);
+                })
+                .catch(error => {
+                    console.error('Error fetching species data:', error);
+                });
+        });
+
+        document.getElementById('fetch-geoserver-layers').addEventListener('click', function() {
+            fetch('/list_geoserver_layers/')
+                .then(response => response.json())
+                .then(data => {
+                    const geoserverLayersDropdown = document.getElementById('geoserver-layers-dropdown');
+                    geoserverLayersDropdown.innerHTML = '<option value="">Select GeoServer Layer</option>';
+                    if (data.layers) {
+                        data.layers.layer.forEach(layer => {
+                            const option = document.createElement('option');
+                            option.value = layer.name;
+                            option.textContent = layer.name;
+                            geoserverLayersDropdown.appendChild(option);
+                        });
+                    } else {
+                        geoserverLayersDropdown.innerHTML = '<option>No layers found</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching layers:', error);
+                });
+        });
+
+        document.getElementById('geoserver-layers-dropdown').addEventListener('change', function() {
+            var layerName = this.value;
+            if (layerName) {
+                fetch(`/get_geoserver_layer_properties/?layer=${layerName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('GeoServer Layer Data:', data); // Debugging: Log the fetched data
+                        occurrencesLayer.clearLayers();
+                        L.geoJSON(data, {
+                            style: function(feature) {
+                                return {
+                                    color: '#3388ff',
+                                    weight: 2,
+                                    opacity: 1,
+                                    fillColor: '#3388ff',
+                                    fillOpacity: 0.2
+                                };
+                            },
+                            onEachFeature: function(feature, layer) {
+                                if (feature.properties) {
+                                    let popupContent = '<div>';
+                                    for (let key in feature.properties) {
+                                        popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+                                    }
+                                    popupContent += '</div>';
+                                    layer.bindPopup(popupContent);
+                                }
+                            }
+                        }).addTo(occurrencesLayer);
+
+                        // Fit map to the layer bounds
+                        if (data.features && data.features.length > 0) {
+                            let bounds = L.geoJSON(data).getBounds();
+                            map.fitBounds(bounds);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching GeoServer layer:', error);
+                    });
+            }
+        });
+
+        document.getElementById('fetch-postgis-layers').addEventListener('click', function() {
+            fetch('/list_postgis_layers/')
+                .then(response => response.json())
+                .then(data => {
+                    const postgisLayersDropdown = document.getElementById('postgis-layers-dropdown');
+                    postgisLayersDropdown.innerHTML = '<option value="">Select PostGIS Layer</option>';
+                    if (data.layers) {
+                        data.layers.forEach(layer => {
+                            const option = document.createElement('option');
+                            option.value = layer;
+                            option.textContent = layer;
+                            postgisLayersDropdown.appendChild(option);
+                        });
+                    } else {
+                        postgisLayersDropdown.innerHTML = '<option>No layers found</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching layers:', error);
+                });
+        });
+
+        document.getElementById('postgis-layers-dropdown').addEventListener('change', function() {
+            var layerName = this.value;
+            if (layerName) {
+                fetch(`/get_postgis_layer/?layer=${layerName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('PostGIS Layer Data:', data); // Debugging: Log the fetched data
+                        occurrencesLayer.clearLayers();
+                        L.geoJSON(data, {
+                            style: function(feature) {
+                                return {
+                                    color: '#ff7800',
+                                    weight: 2,
+                                    opacity: 0.65
+                                };
+                            },
+                            onEachFeature: function(feature, layer) {
+                                if (feature.properties) {
+                                    let popupContent = '<div>';
+                                    for (let key in feature.properties) {
+                                        popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+                                    }
+                                    popupContent += '</div>';
+                                    layer.bindPopup(popupContent);
+                                }
+                            }
+                        }).addTo(occurrencesLayer);
+
+                        // Fit map to the layer bounds
+                        if (data.features && data.features.length > 0) {
+                            let bounds = L.geoJSON(data).getBounds();
+                            map.fitBounds(bounds);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching PostGIS layer:', error);
+                    });
+            }
+        });
+
+        document.getElementById('create-buffer').addEventListener('click', function() {
+            var diameter = document.getElementById('buffer-diameter').value;
+            if (!diameter) {
+                alert('Please enter a buffer diameter.');
+                return;
+            }
+
+            fetch('/get_occurrences_data/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('GBIF Data for Buffering:', data); // Debugging: Log the fetched data
+                    occurrencesLayer.clearLayers();
+                    L.geoJSON(data, {
+                        pointToLayer: function (feature, latlng) {
+                            if (feature.geometry.type === 'Point') {
+                                return L.marker(latlng);
+                            }
+                        },
+                        onEachFeature: function (feature, layer) {
+                            // Add popup for each occurrence
+                            if (feature.geometry.type === 'Point') {
+                                layer.bindPopup(`<b>Occurrence:</b> ${feature.properties.species}`);
+                            }
+
+                            // Create buffer around each occurrence
+                            if (feature.geometry.type === 'Point') {
+                                var buffered = turf.buffer(layer.toGeoJSON(), diameter, { units: 'meters' });
+                                L.geoJSON(buffered, {
+                                    style: {
+                                        color: 'red',
+                                        weight: 2,
+                                        opacity: 0.6,
+                                        fillOpacity: 0.2
+                                    }
+                                }).addTo(occurrencesLayer);
+                            }
+                        }
+                    }).addTo(occurrencesLayer);
+                })
+                .catch(error => {
+                    console.error('Error fetching occurrences:', error);
+                });
+        });
+
+        document.getElementById('postgis-query-layer').addEventListener('change', function() {
+            var layer = document.getElementById('postgis-query-layer').value;
+            fetch(`/get_postgis_layer_properties/?layer=${layer}`)
+                .then(response => response.json())
+                .then(data => {
+                    const postgisQueryProperty = document.getElementById('postgis-query-property');
+                    postgisQueryProperty.innerHTML = '';
+                    if (data.properties) {
+                        data.properties.forEach(property => {
+                            const option = document.createElement('option');
+                            option.value = property;
+                            option.textContent = property;
+                            postgisQueryProperty.appendChild(option);
+                        });
+                    } else {
+                        postgisQueryProperty.innerHTML = '<option>No properties found</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching properties:', error);
+                });
+        });
+
+        document.getElementById('postgis-query-property').addEventListener('change', function() {
+            var layer = document.getElementById('postgis-query-layer').value;
+            var property = this.value;
+            fetch(`/get_property_values/?layer=${layer}&property=${property}`)
+                .then(response => response.json())
+                .then(data => {
+                    const valueSelect = document.getElementById('postgis-query-value');
+                    valueSelect.innerHTML = '<option value="">Select Value</option>';
+                    if (data.values) {
+                        data.values.forEach(value => {
+                            const option = document.createElement('option');
+                            option.value = value;
+                            option.textContent = value;
+                            valueSelect.appendChild(option);
+                        });
+                    }
+                });
+        });
+
+        document.getElementById('perform-postgis-query').addEventListener('click', function() {
+            var layer = document.getElementById('postgis-query-layer').value;
+            var property = document.getElementById('postgis-query-property').value;
+            var value = document.getElementById('postgis-query-value').value;
+
+            if (!layer || !property || !value) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            fetch(`/spatial_query/?layer=${layer}&property=${property}&value=${value}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('PostGIS Query Data:', data);
+                    
+                    // Clear all layers before adding the new layer
+                    map.eachLayer(function (layer) {
+                        if (layer instanceof L.GeoJSON || layer instanceof L.Marker) {
+                            map.removeLayer(layer);
+                        }
+                    });
+                    
+                    L.geoJSON(data, {
+                        style: function(feature) {
+                            return {
+                                color: '#3388ff',
+                                weight: 2,
+                                opacity: 1,
+                                fillColor: '#3388ff',
+                                fillOpacity: 0.2
+                            };
+                        },
+                        onEachFeature: function(feature, layer) {
+                            if (feature.properties) {
+                                let popupContent = '<div>';
+                                for (let key in feature.properties) {
+                                    popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+                                }
+                                popupContent += '</div>';
+                                layer.bindPopup(popupContent);
+                            }
+                        }
+                    }).addTo(map); // Add to the main map layer
+
+                    // Fit map to the query results
+                    if (data.features && data.features.length > 0) {
+                        let bounds = L.geoJSON(data).getBounds();
+                        map.fitBounds(bounds);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error performing PostGIS query:', error);
+                });
+        });
+
+        document.getElementById('perform-cql-query').addEventListener('click', function() {
+            var layer = document.getElementById('cql-query-layer').value;
+            var property = document.getElementById('cql-query-property').value;
+            var value = document.getElementById('cql-query-value').value;
+
+            if (!layer || !property || !value) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            fetch(`/geoserver_ccq/?layer=${layer}&property=${property}&value=${value}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('CQL Query Data:', data);
+                    
+                    // Clear all layers before adding the new layer
+                    map.eachLayer(function (layer) {
+                        if (layer instanceof L.GeoJSON || layer instanceof L.Marker) {
+                            map.removeLayer(layer);
+                        }
+                    });
+                    
+                    L.geoJSON(data, {
+                        style: function(feature) {
+                            return {
+                                color: '#ff7800',
+                                weight: 2,
+                                opacity: 0.65
+                            };
+                        },
+                        onEachFeature: function(feature, layer) {
+                            if (feature.properties) {
+                                let popupContent = '<div>';
+                                for (let key in feature.properties) {
+                                    popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+                                }
+                                popupContent += '</div>';
+                                layer.bindPopup(popupContent);
+                            }
+                        }
+                    }).addTo(map); // Add to the main map layer
+
+                    // Fit map to the query results
+                    if (data.features && data.features.length > 0) {
+                        let bounds = L.geoJSON(data).getBounds();
+                        map.fitBounds(bounds);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error performing CQL query:', error);
+                });
+        });
+    </script>
+</body>
+</html>
