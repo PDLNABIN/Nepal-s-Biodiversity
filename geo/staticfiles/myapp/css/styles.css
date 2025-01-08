@@ -1,0 +1,91 @@
+ /* Hero Section Styling */
+ .hero {
+  background-image: url("../images/Nepal.jpg");
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding: 0 15px;
+  animation: fadeIn 2s ease-out;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  color:rgb(11, 11, 21);
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-top: 10px;
+  font-weight: 300;
+  color:rgb(11, 11, 21);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Info Section Cards */
+.info-section .card {
+  border: 2px solid #e3e3e3;
+  border-radius: 10px;
+  transition: transform 0.3s;
+}
+
+.info-section .card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.info-card {
+  background-color: #f7f7f7;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+}
+
+.info-card:hover {
+  background-color: #e2f2e6;
+}
+
+/* Footer Styling */
+footer {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+footer a {
+  color: #f7f7f7;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+footer a:hover {
+  color: #4caf50;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2rem;
+  }
+  .hero p {
+    font-size: 1rem;
+  }
+  .info-section .col-md-4 {
+    margin-bottom: 20px;
+  }
+}
