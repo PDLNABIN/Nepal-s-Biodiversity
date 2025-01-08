@@ -1,6 +1,6 @@
  /* Hero Section Styling */
  .hero {
-  background-image: url('Nepal.jpg');
+  background-image: url("../images/Nepal.jpg");
   background-size: cover;
   background-position: center;
   color: #fff;

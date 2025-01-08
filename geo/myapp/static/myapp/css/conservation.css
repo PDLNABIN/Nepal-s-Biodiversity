@@ -1,14 +1,19 @@
+
 .head {
-    background-image: url('Sagarmatha.jpg'); /* Path to your background image */
+    background-image: url('../images/Sagarmatha.jpg'); /* Path to your background image */
     background-size: cover; /* Ensures the image covers the entire area */
     background-position: center; /* Centers the image in the background */
     background-repeat: no-repeat; /* Prevents the image from repeating */
-    color: rgb(9, 9, 9); /* Fixed the color property */
-    text-align: center;
-    height: 85vh;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    color: white; /* Makes the text stand out against the background */
+    text-align: center; /* Centers text horizontally */
+    height: 85vh; /* Sets the height of the header */
+    display: flex; /* Enables flexbox for centering */
+    flex-direction: column; /* Stacks content vertically */
+    justify-content: center; /* Centers content vertically */
+    align-items: center; /* Centers content horizontally */
+    font-family: 'Arial', sans-serif; /* Ensures consistent font styling */
+    padding: 20px; /* Adds padding around the content */
+    box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.4); /* Optional: Adds a semi-transparent overlay for better text visibility */
 }
 /* Header */
 .head {

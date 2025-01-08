@@ -43,7 +43,7 @@ def get_locations(request):
 
 def list_geoserver_layers(request):
     geoserver_url = 'http://localhost:8080/geoserver/rest/layers'
-    auth = ('admin', 'geoserver')  # Replace with your GeoServer username and password
+    auth = ('admin', 'geoserver')  
 
     response = requests.get(geoserver_url, auth=auth, headers={'Accept': 'application/json'})
     if response.status_code == 200:
